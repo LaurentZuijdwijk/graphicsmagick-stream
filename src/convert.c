@@ -274,9 +274,9 @@ int parse (size_t size, unsigned char *data) {
       data = MagickWriteImageBlob(output, &size);
       writtendata = io_write(size, data);
       free(data);
+      destroy(input, output);
     }
   }
-  //destroy(input, output);
   return writtendata;
 }
 
