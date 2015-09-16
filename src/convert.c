@@ -196,9 +196,9 @@ int convert (MagickWand *input, MagickWand **output, convert_t *opts, unsigned c
   MagickNextImage(input); // Has to be called after MagickResetIterator to set the first picture as the current
   do {
     if (convert_format(input, opts) != MagickPass) return -3;
+    if (convert_crop(input, opts) != MagickPass)   return -6;
     if (convert_scale(input, opts) != MagickPass)  return -4;
     if (convert_rotate(input, opts) != MagickPass) return -5;
-    if (convert_crop(input, opts) != MagickPass)   return -6;
   } while (MagickNextImage(input));
   return 0;
 }
