@@ -32,6 +32,8 @@ typedef struct {
   uint32_t page_end;
   uint32_t format;
   uint32_t split;
+  uint32_t quality;
+
 } convert_t;
 
 typedef struct {
@@ -49,6 +51,11 @@ int convert_format (MagickWand *input, convert_t *opts) {
 int convert_density (MagickWand *input, convert_t* opts) {
   if (!opts->density) return MagickPass;
   return MagickSetResolution(input, opts->density, opts->density);
+}
+
+int convert_quality (MagickWand *output, convert_t* opts) {
+  if (!opts->quality) return MagickPass;
+  return MagickSetCompressionQuality(output, opts->quality);
 }
 
 int convert_rotate (MagickWand *input, convert_t *opts) {
@@ -191,6 +198,8 @@ int convert (MagickWand *input, MagickWand **output, convert_t *opts, unsigned c
   if (convert_adjoin(input, output, opts) != MagickPass) return -8;
 
   input = *output;
+
+  if(convert_quality(input, opts) != MagickPass) return -8;
 
   MagickResetIterator(input);
   MagickNextImage(input); // Has to be called after MagickResetIterator to set the first picture as the current
