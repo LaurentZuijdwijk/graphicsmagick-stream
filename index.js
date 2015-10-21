@@ -83,9 +83,7 @@ var toStruct = function (opts) {
     buf.writeUInt32LE(opts.split || 0, offset += 4)
     // quality
 
-    console.log(opts, opts.quality)
-
-    buf.writeUInt32LE(opts.quality || 75, offset += 4)
+    buf.writeUInt32LE(opts.quality || 0, offset += 4)
 
     return buf
 }
@@ -146,7 +144,8 @@ var pool = function (opts) {
         child.stdout.on('error', onerror)
         child.stderr.on('error', onerror)
         child.stdin.on('error', onerror)
-        if (DEBUGGING) child.stderr.pipe(process.stderr)
+        //if (DEBUGGING)
+        child.stderr.pipe(process.stderr)
 
         var missing = 0
         var stream
