@@ -352,9 +352,9 @@ int parse (size_t size, unsigned char *data) {
     } else {
  
     char *format = MagickGetImageFormat(output);   
-      fprintf(stderr, " quality %d\n", opts->quality);
-      fprintf(stderr, "input format %s\n", format);
-      fprintf(stderr, "opts format %s\n", opts->format);
+      // fprintf(stderr, " quality %d\n", opts->quality);
+      // fprintf(stderr, "input format %s\n", format);
+      // fprintf(stderr, "opts format %s\n", opts->format);
     
       if(strcmp(format,"PNG") == 0 && opts->quality != 0){
         struct bufferAndSize d = pngQuant(output);
