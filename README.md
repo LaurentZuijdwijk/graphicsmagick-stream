@@ -100,7 +100,6 @@ Use `split = true` to output each page as an image file. This will result in a t
 
 You need to install libgraphicsmagicks in order to compile this.
 
-
 ### Using OS X and Homebrew
 
 ```shell
