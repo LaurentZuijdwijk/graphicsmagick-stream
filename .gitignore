@@ -1,3 +1,11 @@
+/lib/lib/viter.lo
+/lib/lib/pam.lo
+/lib/lib/mempool.lo
+/lib/lib/libimagequant.so.0
+/lib/lib/mediancut.lo
+/lib/lib/nearest.lo
+/lib/lib/blur.lo
+/lib/lib/libimagequant.lo
 node_modules
 bin
 .DS_Store
