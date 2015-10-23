@@ -108,6 +108,11 @@ brew install graphicsmagick --build-from-source
 brew install libarchive
 ```
 
+You might need to install the following packages manually:
+
+* libPNG from http://ethan.tira-thompson.com/Mac_OS_X_Ports.html
+* http://macappstore.org/little-cms2/
+
 You will have to build the binary using the following command
 
 ```shell
