@@ -35,7 +35,7 @@ typedef struct {
   uint32_t format;
   uint32_t split;
   uint32_t quality;
-
+  uint32_t enhance;
 } convert_t;
 
 typedef struct {
@@ -64,6 +64,11 @@ int convert_quality (MagickWand *output, uint32_t quality) {
   if (!quality) return MagickPass;
   
   return MagickSetCompressionQuality(output, quality);
+}
+int convert_enhance (MagickWand *output) {
+  return MagickEnhanceImage( output );
+  //return MagickEqualizeImage(output);
+
 }
 
 int convert_rotate (MagickWand *input, convert_t *opts) {
@@ -220,6 +225,12 @@ int convert (MagickWand *input, MagickWand **output, convert_t *opts, unsigned c
     if (convert_scale(input, opts) != MagickPass)  return -4;
     if (convert_rotate(input, opts) != MagickPass) return -5;
   } while (MagickNextImage(input));
+  
+  if(opts->enhance != 0){
+    if (convert_enhance(input) != MagickPass) return -3;
+   
+
+  }
   return 0;
 }
 

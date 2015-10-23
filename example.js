@@ -10,5 +10,5 @@ fs.createReadStream('in.png')
   .pipe(fs.createWriteStream('output2.png'))
 
 fs.createReadStream('in.jpg')
-  .pipe(convert({scale: 300, rotate: 180, quality: 100}))
+  .pipe(convert({scale: 1000, rotate: 180, quality: 100, enhance : 1}))
   .pipe(fs.createWriteStream('out.jpg'))

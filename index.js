@@ -41,7 +41,7 @@ var toUInt32LE = function (len) {
 }
 
 var toStruct = function (opts) {
-    var buf = new Buffer(56)
+    var buf = new Buffer(60)
     var offset = -4
 
     // scale
@@ -84,6 +84,7 @@ var toStruct = function (opts) {
     // quality
 
     buf.writeUInt32LE(opts.quality || 0, offset += 4)
+    buf.writeUInt32LE(opts.enhance || 0, offset += 4)
 
     return buf
 }
