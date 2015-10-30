@@ -33,6 +33,7 @@ var convert = gm({
   },
   quality : 75,        // Compression quality. For JPEG it is default 75. scale 0-100
                        // see http://www.graphicsmagick.org/wand/magick_wand.html#magicksetcompressionquality
+                       // For PNG's the value is ignored, but it will run the image through imagequant to reduce the file size.
 
   page: [1,5],         // only render page 1 to 5 (for pdfs)
                        // set to a single number if you only want to render one page
@@ -110,7 +111,7 @@ brew install libarchive
 You will have to build the binary using the following command
 
 ```shell
-gcc src/*.c -o bin/convert -L/usr/local/opt/libarchive/lib -I/usr/local/opt/libarchive/include -larchive -O `GraphicsMagickWand-config --cflags --cppflags --ldflags --libs`
+gcc src/*.c ./lib/lib/libimagequant.a  -o bin/convert -L/usr/local/opt/libarchive/lib -I/usr/local/opt/libarchive/include -larchive -O `GraphicsMagickWand-config --cflags --cppflags --ldflags --libs`
 ```
 
 
