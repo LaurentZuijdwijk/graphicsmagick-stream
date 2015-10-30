@@ -280,9 +280,26 @@ int parse (size_t size, unsigned char *data) {
       writtendata = io_write_file_to_stdout(filename);
       unlink(filename);
     } else {
-      data = MagickWriteImageBlob(output, &size);
-      writtendata = io_write(size, data);
-      free(data);
+ 
+    char *format = MagickGetImageFormat(output);   
+      // fprintf(stderr, " quality %d\n", opts->quality);
+      // fprintf(stderr, "input format %s\n", format);
+      // fprintf(stderr, "opts format %s\n", opts->format);
+    
+      if(strcmp(format,"PNG") == 0 && opts->quality != 0){
+        struct bufferAndSize d = pngQuant(output);
+        
+        writtendata = io_write(d.size, d.data);
+        free(d.data);
+        free(format);
+
+      }else{
+
+        data = MagickWriteImageBlob(output, &size);
+        writtendata = io_write(size, data);
+        free(data);
+      }
+
       destroy(input, output);
     }
   }
