@@ -1,7 +1,5 @@
 SRC=$(wildcard src/*.c)
 
-
-
 UNAME := $(shell uname)
 
 ifeq ($(UNAME), Darwin)
