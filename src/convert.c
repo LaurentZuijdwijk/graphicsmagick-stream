@@ -9,6 +9,8 @@
 #include <archive.h>
 #include <archive_entry.h>
 #include <wand/magick_wand.h>
+#include "../lib/lib/libimagequant.h"
+#include "./lodepng.cpp"
 
 #define MIN(x,y) (x < y ? x : y)
 
@@ -43,6 +45,11 @@ typedef struct {
   uint32_t pages;
 } convert_info_t;
 
+struct bufferAndSize {
+  size_t size;
+  unsigned char *data;
+};
+
 int convert_format (MagickWand *input, convert_t *opts) {
   if (opts->format < JPEG || opts->format > BMP) return MagickPass;
   return MagickSetImageFormat(input, formats[opts->format]);
@@ -53,9 +60,10 @@ int convert_density (MagickWand *input, convert_t* opts) {
   return MagickSetResolution(input, opts->density, opts->density);
 }
 
-int convert_quality (MagickWand *output, convert_t* opts) {
-  if (!opts->quality) return MagickPass;
-  return MagickSetCompressionQuality(output, opts->quality);
+int convert_quality (MagickWand *output, uint32_t quality) {
+  if (!quality) return MagickPass;
+  
+  return MagickSetCompressionQuality(output, quality);
 }
 
 int convert_rotate (MagickWand *input, convert_t *opts) {
@@ -198,8 +206,11 @@ int convert (MagickWand *input, MagickWand **output, convert_t *opts, unsigned c
   if (convert_adjoin(input, output, opts) != MagickPass) return -8;
 
   input = *output;
-
-  if(convert_quality(input, opts) != MagickPass) return -8;
+  uint32_t quality = 75;
+  if(opts->quality != 0){
+    quality = opts->quality;
+  }
+  if(convert_quality(input, quality) != MagickPass) return -8;
 
   MagickResetIterator(input);
   MagickNextImage(input); // Has to be called after MagickResetIterator to set the first picture as the current
@@ -219,6 +230,8 @@ void destroy (MagickWand *input, MagickWand *output) {
 
 int write_archive_from_mem(char *outname, MagickWand *wand)
 {
+
+
   int archiveSize = 0;
   int pageNumber = 1;
   struct archive *a;
@@ -248,6 +261,62 @@ int write_archive_from_mem(char *outname, MagickWand *wand)
   return archiveSize;
 }
 
+struct bufferAndSize pngQuant(MagickWand *output){
+
+      unsigned long wid = MagickGetImageWidth(output);
+      unsigned long hei = MagickGetImageHeight(output);
+      unsigned char *bmp_buffer;
+      bmp_buffer = (unsigned char*) malloc(wid*hei*4);
+      MagickGetImagePixels(output,0,0,wid,hei,"RGBA",CharPixel,bmp_buffer);
+
+      liq_attr *attr = liq_attr_create();
+      liq_image *qimage = liq_image_create_rgba(attr, bmp_buffer, wid, hei, 0);
+      liq_set_max_colors(attr, 255);
+      liq_set_speed(attr, 10);
+      liq_result *res = liq_quantize_image(attr, qimage);
+
+      int png_buffer_size = wid*hei;
+      unsigned char *png_buffer = malloc(png_buffer_size);
+
+      liq_write_remapped_image(res, qimage, png_buffer, png_buffer_size);
+      const liq_palette *pal = liq_get_palette(res);
+
+      LodePNGState state;
+
+      lodepng_state_init(&state);
+      /*optionally customize the state*/
+      state.info_png.color.bitdepth = 8;
+      state.info_png.color.colortype = LCT_PALETTE;
+      state.info_raw.colortype = LCT_PALETTE;
+      state.info_raw.bitdepth = 8;
+      state.encoder.auto_convert = 0;
+      state.encoder.add_id = 0;
+      state.encoder.zlibsettings.nicematch = 258;
+      int i = 0;
+      for (i=0; i < pal->count; ++i)
+      {
+        lodepng_palette_add(&state.info_png.color, pal->entries[i].r , pal->entries[i].g, pal->entries[i].b, pal->entries[i].a);
+        lodepng_palette_add(&state.info_raw, pal->entries[i].r , pal->entries[i].g, pal->entries[i].b, pal->entries[i].a);
+      }
+      unsigned char *data;
+      size_t size = 0;
+      lodepng_encode(&data, &size, png_buffer, wid, hei, &state);
+      // writtendata = io_write(size, data);
+      lodepng_state_cleanup(&state);
+      free(bmp_buffer);
+      free(png_buffer);
+      liq_attr_destroy(attr);
+      liq_image_destroy(qimage);
+      liq_result_destroy(res);
+
+      lodepng_state_cleanup(&state);
+      struct bufferAndSize bs;
+      bs.data = data;
+      bs.size = size;
+      return bs;
+}
+
+
 int parse (size_t size, unsigned char *data) {
   int writtendata = 0;
   MagickWand *input = NewMagickWand();
@@ -276,16 +345,14 @@ int parse (size_t size, unsigned char *data) {
       // If we split the file then we will make a tarball containing all the pages
       char* filename;
       filename = tmpnam (NULL);
+
       size = write_archive_from_mem(filename, output);
       writtendata = io_write_file_to_stdout(filename);
       unlink(filename);
     } else {
  
     char *format = MagickGetImageFormat(output);   
-      // fprintf(stderr, " quality %d\n", opts->quality);
-      // fprintf(stderr, "input format %s\n", format);
-      // fprintf(stderr, "opts format %s\n", opts->format);
-    
+
       if(strcmp(format,"PNG") == 0 && opts->quality != 0){
         struct bufferAndSize d = pngQuant(output);
         
@@ -305,6 +372,8 @@ int parse (size_t size, unsigned char *data) {
   }
   return writtendata;
 }
+
+
 
 int main (int argc, char *argv[]) {
   InitializeMagick(*argv);
