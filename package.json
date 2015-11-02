@@ -25,7 +25,7 @@
     "stream"
   ],
   "scripts": {
-    "install": "make",
+    "install": "make clean bin/convert",
     "test": "tape test/*.js"
   },
   "author": "Mathias Buus",
