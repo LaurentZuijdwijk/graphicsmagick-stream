@@ -83,8 +83,6 @@ var toStruct = function (opts) {
     buf.writeUInt32LE(opts.split || 0, offset += 4)
     // quality
 
-    console.log(opts, opts.quality)
-
     buf.writeUInt32LE(opts.quality || 75, offset += 4)
 
     return buf
