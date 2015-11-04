@@ -69,7 +69,6 @@ int convert_quality (MagickWand *output, uint32_t quality) {
 
 int convert_enhance (MagickWand *output) {
   // We take the following steps to do image enhancement:
-
   // clone the Wand
   MagickWand *clone = CloneMagickWand(output );
  
@@ -279,8 +278,6 @@ void destroy (MagickWand *input, MagickWand *output) {
 
 int write_archive_from_mem(char *outname, MagickWand *wand)
 {
-
-
   int archiveSize = 0;
   int pageNumber = 1;
   struct archive *a;
