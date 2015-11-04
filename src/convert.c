@@ -65,10 +65,48 @@ int convert_quality (MagickWand *output, uint32_t quality) {
   
   return MagickSetCompressionQuality(output, quality);
 }
-int convert_enhance (MagickWand *output) {
-  return MagickEnhanceImage( output );
-  //return MagickEqualizeImage(output);
 
+
+int convert_enhance (MagickWand *output) {
+  // We take the following steps to do image enhancement:
+
+  // clone the Wand
+  MagickWand *clone = CloneMagickWand(output );
+ 
+  unsigned long wid = MagickGetImageWidth(output);
+  unsigned long hei = MagickGetImageHeight(output);
+  unsigned char *bmp_buffer;
+  unsigned char *bmp_buffer2;
+  // get pixels of the original and the clone
+  bmp_buffer = (unsigned char*) malloc(wid*hei*4);
+  bmp_buffer2 = (unsigned char*) malloc(wid*hei*4);
+  // apply level equalization
+  MagickContrastImage(clone, 1);
+  MagickNormalizeImage(clone);
+  // get the pixels of the clone and the original
+  MagickGetImagePixels(clone,0,0,wid,hei,"RGBA",CharPixel,bmp_buffer);
+  MagickGetImagePixels(output,0,0,wid,hei,"RGBA",CharPixel,bmp_buffer2);
+  int len = wid*hei*4;
+  int i;
+ 
+  for(i = 0; i < len; i = i+4 ){
+    // apply part of the difference between the clone and the original to the original image 
+    bmp_buffer2[i] = bmp_buffer2[i] - (bmp_buffer2[i] - bmp_buffer[i])/2;
+    bmp_buffer2[i+1] = bmp_buffer2[i+1] - (bmp_buffer2[i+1] - bmp_buffer[i+1])/2;
+    bmp_buffer2[i+2] = bmp_buffer2[i+2] - (bmp_buffer2[i+2] - bmp_buffer[i+2])/2;
+  }
+  //apply the new pixels to the original
+  MagickSetImagePixels(output,0,0,wid,hei,"RGBA",CharPixel,bmp_buffer2);
+
+  //sharpen the image
+  MagickUnsharpMaskImage(output,0, 5, 20, 20);
+
+  // clean up
+  free(bmp_buffer2);
+  free(bmp_buffer);
+  DestroyMagickWand(clone);
+
+  return 1;
 }
 
 int convert_rotate (MagickWand *input, convert_t *opts) {
@@ -327,7 +365,6 @@ struct bufferAndSize pngQuant(MagickWand *output){
       return bs;
 }
 
-
 int parse (size_t size, unsigned char *data) {
   int writtendata = 0;
   MagickWand *input = NewMagickWand();
@@ -375,7 +412,6 @@ int parse (size_t size, unsigned char *data) {
         free(format);
 
       }else{
-
         data = MagickWriteImageBlob(output, &size);
         writtendata = io_write(size, data);
         free(data);
