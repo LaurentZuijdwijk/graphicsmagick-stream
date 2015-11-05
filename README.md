@@ -34,7 +34,7 @@ var convert = gm({
   quality : 75,        // Compression quality. For JPEG it is default 75. scale 0-100
                        // see http://www.graphicsmagick.org/wand/magick_wand.html#magicksetcompressionquality
                        // For PNG's the value is ignored, but it will run the image through imagequant to reduce the file size.
-
+  enhance : 0          // apply limited sharpening and level equalization
   page: [1,5],         // only render page 1 to 5 (for pdfs)
                        // set to a single number if you only want to render one page
                        // or omit if you want all pages

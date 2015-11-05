@@ -104,6 +104,21 @@ tape('convert', function(t) {
     })
   })
 
+  t.test('enhance', function(t) {
+    t.test('jpeg', function(t) {
+      fixtures.jpeg()
+        .pipe(convert({enhance: 1}))
+        .pipe(convert.info(function(err, data) {
+          t.error(err, 'should not return error')
+          t.equals(data.width, 640, 'should have the correct width')
+          t.equals(data.height, 480, 'should have the correct height')
+          t.equals(data.format, 'jpeg', 'should still be a jpeg file')
+          t.end()
+        }))
+    })
+  })
+
+
   t.test('scale and rotate', function(t) {
     t.test('jpeg', function(t) {
       fixtures.jpeg()
