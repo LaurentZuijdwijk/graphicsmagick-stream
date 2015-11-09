@@ -1,5 +1,5 @@
 {
-  "name": "graphicsmagick-stream",
+  "name": "@newsint/graphicsmagick-stream",
   "version": "3.0.0",
   "publishConfig":{"registry":"https://newsint.artifactoryonline.com/newsint/api/npm/npm-tnl"}
   "description": "Fast convertion/scaling of images using a pool of long lived graphicsmagick processes",
