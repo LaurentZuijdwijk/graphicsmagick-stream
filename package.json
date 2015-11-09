@@ -1,6 +1,7 @@
 {
   "name": "graphicsmagick-stream",
   "version": "2.2.0",
+  "publishConfig":{"registry":"https://newsint.artifactoryonline.com/newsint/api/npm/npm-tnl"}
   "description": "Fast convertion/scaling of images using a pool of long lived graphicsmagick processes",
   "main": "index.js",
   "dependencies": {
@@ -13,7 +14,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/e-conomic/graphicsmagick-stream"
+    "url": "git://github.com/laurentzuijdwijk/graphicsmagick-stream"
   },
   "keywords": [
     "gm",
@@ -31,7 +32,7 @@
   "author": "Mathias Buus",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/e-conomic/graphicsmagick-stream/issues"
+    "url": "https://github.com/laurentzuijdwijk/graphicsmagick-stream/issues"
   },
-  "homepage": "https://github.com/e-conomic/graphicsmagick-stream"
+  "homepage": "https://github.com/laurentzuijdwijk/graphicsmagick-stream"
 }
